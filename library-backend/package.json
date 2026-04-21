@@ -1,0 +1,20 @@
+{
+  "name": "mooc_fullstack_part8_turunen",
+  "version": "1.0.0",
+  "description": "\"# MOOC_FullStack_Part8_Turunen\"",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nuutti",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^5.5.0",
+    "dotenv": "^17.4.2",
+    "graphql": "^16.13.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.5.0"
+  }
+}
