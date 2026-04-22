@@ -1,24 +1,34 @@
 import { useEffect, useState } from 'react'
-import { useApolloClient } from '@apollo/client/react'
+import {
+    useApolloClient,
+    useQuery,
+    useSubscription,
+} from '@apollo/client/react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/Login.jsx'
 import Recommended from './components/Recommend.jsx'
-
+import {BOOK_ADDED} from "./queries.js";
+import { addBookToCache } from './utils/apolloCache'
 const App = () => {
     const [page, setPage] = useState('authors')
     const [token, setToken] = useState(null)
-
     const client = useApolloClient()
-
+    useSubscription(BOOK_ADDED, {
+        onData: ({ data }) => {
+            console.log(data)
+            const addedBook = data.data.bookAdded
+            window.alert('A new book was added!!')
+            addBookToCache(client.cache, addedBook)
+        },
+    })
     useEffect(() => {
         const savedToken = localStorage.getItem('library-user-token')
         if (savedToken) {
             setToken(savedToken)
         }
     }, [])
-
     const logout = () => {
         setToken(null)
         localStorage.clear()
@@ -32,7 +42,6 @@ const App = () => {
                 <button onClick={() => setPage('authors')}>authors</button>
                 <button onClick={() => setPage('books')}>books</button>
                 <button onClick={() => setPage('recommended')}>recommended</button>
-
                 {token ? (
                     <>
                         <button onClick={() => setPage('add')}>add book</button>
@@ -42,7 +51,6 @@ const App = () => {
                     <button onClick={() => setPage('login')}>login</button>
                 )}
             </div>
-
             <Authors show={page === 'authors'}/>
             <Books show={page === 'books'} />
             <NewBook show={page === 'add'} />
