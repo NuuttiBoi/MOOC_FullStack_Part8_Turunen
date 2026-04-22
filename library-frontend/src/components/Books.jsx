@@ -1,32 +1,37 @@
 import { useState } from 'react'
 import { useQuery } from '@apollo/client/react'
 import { ALL_BOOKS } from '../queries'
-const Books = (props) => {
-    const [selectedGenre, setSelectedGenre] = useState(null)
-    const allBooksResult = useQuery(ALL_BOOKS, {
-        variables: { genre: null },
-        skip: !props.show,
+
+const Books = ({ show }) => {
+    const [genre, setGenre] = useState(null)
+
+    const result = useQuery(ALL_BOOKS, {
+        skip: !show,
     })
-    const filteredBooksResult = useQuery(ALL_BOOKS, {
-        variables: { genre: selectedGenre },
-        skip: !props.show,
-        fetchPolicy: 'network-only',
-    })
-    if (!props.show) {
-        return null
-    }
-    if (allBooksResult.loading || filteredBooksResult.loading) {
+    if (!show) {
+        return null}
+    if (result.loading) {
         return <div>loading...</div>
     }
-    const allBooks = allBooksResult.data.allBooks
-    const booksToShow = filteredBooksResult.data.allBooks
-    const genres = [...new Set(allBooks.flatMap((book) => book.genres))]
+    const books = result.data.allBooks
+    const filteredBooks = genre
+        ? books.filter(book => book.genres.includes(genre))
+        : books
+
+    const allGenres = []
+    books.forEach(book => {
+        book.genres.forEach(genre => {
+            if (!allGenres.includes(genre)) {
+                allGenres.push(genre)
+            }
+        })
+    })
     return (
         <div>
             <h2>books</h2>
-            <div>
-                in genre <strong>{selectedGenre || 'all genres'}</strong>
-            </div>
+            <p>
+                in genre <strong>{genre ? genre : 'all genres'}</strong>
+            </p>
             <table>
                 <tbody>
                 <tr>
@@ -34,26 +39,22 @@ const Books = (props) => {
                     <th>author</th>
                     <th>published</th>
                 </tr>
-                {booksToShow.map((b) => (
-                    <tr key={b.id}>
-                        <td>{b.title}</td>
-                        <td>{b.author.name}</td>
-                        <td>{b.published}</td>
+                {filteredBooks.map(book => (
+                    <tr key={book.id}>
+                        <td>{book.title}</td>
+                        <td>{book.author.name}</td>
+                        <td>{book.published}</td>
                     </tr>
                 ))}
                 </tbody>
             </table>
-
-            <div>
-                {genres.map((genre) => (
-                    <button
-                        key={genre}
-                        onClick={() => setSelectedGenre(genre)}
-                    >
-                        {genre}
+                <div>
+                {allGenres.map(g => (
+                    <button key={g} onClick={() => setGenre(g)}>
+                        {g}
                     </button>
                 ))}
-                <button onClick={() => setSelectedGenre(null)}>all genres</button>
+                <button onClick={() => setGenre(null)}>all genres</button>
             </div>
         </div>
     )

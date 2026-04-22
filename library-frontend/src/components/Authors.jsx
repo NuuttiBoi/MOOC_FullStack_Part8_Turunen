@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client/react'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
+
 const Authors = ({ show }) => {
   const { loading, data, error } = useQuery(ALL_AUTHORS)
   const [born, setBorn] = useState('')
@@ -9,23 +10,27 @@ const Authors = ({ show }) => {
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
   })
+
   if (!show) {
     return null
   }
+
   if (loading) {
     return <div>loading...</div>
   }
+
   if (error) {
     return <div>Error: {error.message}</div>
   }
-  const authors = data?.allAuthors ?? []
+
+  const authors = data?.allAuthors || []
   const submit = async (event) => {
     event.preventDefault()
     if (!name || !born) return
     try {
       await editAuthor({
         variables: {
-          name,
+          name: name,
           setBornTo: Number(born),
         },
       })
@@ -45,7 +50,7 @@ const Authors = ({ show }) => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.map((a) => (
+          {authors.map(a => (
               <tr key={a.name}>
                 <td>{a.name}</td>
                 <td>{a.born}</td>
@@ -57,11 +62,14 @@ const Authors = ({ show }) => {
         <h3>set birthyear</h3>
         <form onSubmit={submit}>
           <div>
-            <select value={name} onChange={({ target }) => setName(target.value)}>
+            <select
+                value={name}
+                onChange={({ target }) => setName(target.value)}
+            >
               <option value="" disabled>
                 select author
               </option>
-              {authors.map((a) => (
+              {authors.map(a => (
                   <option key={a.name} value={a.name}>
                     {a.name}
                   </option>

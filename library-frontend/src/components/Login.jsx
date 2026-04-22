@@ -5,7 +5,6 @@ import { LOGIN } from '../queries'
 const LoginForm = ({ show, setToken, setPage }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-
     const [login] = useMutation(LOGIN, {
         onCompleted: (data) => {
             const token = data.login.value
@@ -14,21 +13,17 @@ const LoginForm = ({ show, setToken, setPage }) => {
             setPage('authors')
         },
     })
-
     if (!show) {
         return null
     }
-
     const submit = async (event) => {
         event.preventDefault()
-
         await login({
             variables: {
                 username,
                 password,
             },
         })
-
         setUsername('')
         setPassword('')
     }
@@ -36,7 +31,6 @@ const LoginForm = ({ show, setToken, setPage }) => {
     return (
         <div>
             <h2>login</h2>
-
             <form onSubmit={submit}>
                 <div>
                     username
@@ -45,7 +39,6 @@ const LoginForm = ({ show, setToken, setPage }) => {
                         onChange={({ target }) => setUsername(target.value)}
                     />
                 </div>
-
                 <div>
                     password
                     <input
