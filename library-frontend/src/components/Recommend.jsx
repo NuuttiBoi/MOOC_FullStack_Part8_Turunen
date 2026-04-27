@@ -15,9 +15,11 @@ const Recommended = ({ show }) => {
     if (meQuery.error) {
         return <div>error: {meQuery.error.message}</div>
     }
-
     const books = booksQuery.data.allBooks
     const user = meQuery.data.me
+    if (!user) {
+        return <div>not logged in</div>
+    }
     const favoriteGenre = user.favoriteGenre
     const filteredBooks = books.filter(book => {
         return book.genres.includes(favoriteGenre)
@@ -26,8 +28,7 @@ const Recommended = ({ show }) => {
         <div>
             <h2>recommendations</h2>
             <p>
-                books in your favorite genre <strong>{favoriteGenre}</strong>
-            </p>
+            books in your favorite genre <strong>{favoriteGenre}</strong></p>
             <table>
                 <tbody>
                 <tr>
@@ -42,8 +43,9 @@ const Recommended = ({ show }) => {
                         <td>{book.published}</td>
                     </tr>
                 ))}
-                </tbody></table>
+                </tbody>
+            </table>
         </div>
-        )
+    )
 }
 export default Recommended

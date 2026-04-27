@@ -54,6 +54,8 @@ const typeDefs = `#graphql
       username: String!
       password: String!
     ): Token
+    
+    _resetDatabase: Boolean
   }
   
    type Subscription {

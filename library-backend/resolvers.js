@@ -62,7 +62,7 @@ const resolvers = {
                 await book.save()
                 const newBook = await Book.findById(book._id).populate('author')
                 pubsub.publish('BOOK_ADDED', { bookAdded: newBook })
-                return populatedBook
+                return newBook
             } catch (error) {
                 throw new GraphQLError(`Saving book failed, reason: ${error.message}`, {
                     extensions: {
@@ -129,6 +129,15 @@ const resolvers = {
                 id: user._id,
             }
             return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
+        },
+        _resetDatabase: async () => {
+            if (process.env.NODE_ENV !== 'test') {
+                throw new GraphQLError('_resetDatabase can be used oly in test mode')
+            }
+            await Author.deleteMany({})
+            await Book.deleteMany({})
+            await User.deleteMany({})
+            return true
         },
     },
     Subscription: {
